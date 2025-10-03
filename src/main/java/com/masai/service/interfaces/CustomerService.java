@@ -1,16 +1,16 @@
-package com.masai.service;
+package com.masai.service.interfaces;
 
 import java.util.List;
 
 import com.masai.exception.CustomerException;
 import com.masai.exception.CustomerNotFoundException;
-import com.masai.models.Address;
-import com.masai.models.CreditCard;
-import com.masai.models.Customer;
-import com.masai.models.CustomerDTO;
-import com.masai.models.CustomerUpdateDTO;
-import com.masai.models.Order;
-import com.masai.models.SessionDTO;
+import com.masai.model.Address;
+import com.masai.model.CreditCard;
+import com.masai.model.Customer;
+import com.masai.dto.CustomerDTO;
+import com.masai.dto.CustomerUpdateDTO;
+import com.masai.model.Order;
+import com.masai.dto.SessionDTO;
 
 public interface CustomerService {
 	

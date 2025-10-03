@@ -1,4 +1,4 @@
-package com.masai.models;
+package com.masai.dto;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -5,15 +5,14 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.masai.exception.CategoryNotFoundException;
 import com.masai.exception.ProductNotFoundException;
-import com.masai.models.CategoryEnum;
-import com.masai.models.Product;
-import com.masai.models.ProductDTO;
-import com.masai.models.ProductStatus;
-import com.masai.models.Seller;
+import com.masai.model.CategoryEnum;
+import com.masai.model.Product;
+import com.masai.dto.ProductDTO;
+import com.masai.model.ProductStatus;
+import com.masai.model.Seller;
 import com.masai.repository.ProductDao;
 import com.masai.repository.SellerDao;
 

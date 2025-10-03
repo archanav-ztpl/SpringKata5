@@ -10,14 +10,13 @@ import org.springframework.stereotype.Service;
 
 import com.masai.exception.LoginException;
 import com.masai.exception.OrderException;
-import com.masai.models.CartDTO;
-import com.masai.models.CartItem;
-import com.masai.models.Customer;
-import com.masai.models.Order;
-import com.masai.models.OrderDTO;
-import com.masai.models.OrderStatusValues;
-import com.masai.models.Product;
-import com.masai.models.ProductStatus;
+import com.masai.dto.CartDTO;
+import com.masai.model.CartItem;
+import com.masai.model.Customer;
+import com.masai.model.Order;
+import com.masai.dto.OrderDTO;
+import com.masai.model.OrderStatusValues;
+import com.masai.model.ProductStatus;
 import com.masai.repository.OrderDao;
 
 @Service

@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.masai.models.Address;
-import com.masai.models.CreditCard;
-import com.masai.models.Customer;
-import com.masai.models.CustomerDTO;
-import com.masai.models.CustomerUpdateDTO;
-import com.masai.models.Order;
-import com.masai.models.SessionDTO;
+import com.masai.model.Address;
+import com.masai.model.CreditCard;
+import com.masai.model.Customer;
+import com.masai.model.CustomerDTO;
+import com.masai.model.CustomerUpdateDTO;
+import com.masai.model.Order;
+import com.masai.model.SessionDTO;
 import com.masai.service.CustomerService;
 
 @RestController

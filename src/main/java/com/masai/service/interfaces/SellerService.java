@@ -1,11 +1,11 @@
-package com.masai.service;
+package com.masai.service.interfaces;
 
 import java.util.List;
 
 import com.masai.exception.SellerException;
-import com.masai.models.Seller;
-import com.masai.models.SellerDTO;
-import com.masai.models.SessionDTO;
+import com.masai.model.Seller;
+import com.masai.dto.SellerDTO;
+import com.masai.dto.SessionDTO;
 
 public interface SellerService {
 	

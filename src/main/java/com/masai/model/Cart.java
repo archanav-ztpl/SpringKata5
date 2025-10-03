@@ -1,4 +1,4 @@
-package com.masai.models;
+package com.masai.model;
 
 
 import java.util.ArrayList;
@@ -39,9 +39,3 @@ public class Cart {
 	private Customer customer;
 
 }
-
-
-
-
-
-

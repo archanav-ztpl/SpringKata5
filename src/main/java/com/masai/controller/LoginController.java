@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.masai.models.Customer;
-import com.masai.models.CustomerDTO;
-import com.masai.models.Seller;
-import com.masai.models.SellerDTO;
-import com.masai.models.SessionDTO;
-import com.masai.models.UserSession;
+import com.masai.model.Customer;
+import com.masai.model.CustomerDTO;
+import com.masai.model.Seller;
+import com.masai.model.SellerDTO;
+import com.masai.model.SessionDTO;
+import com.masai.model.UserSession;
 import com.masai.service.CustomerService;
 import com.masai.service.LoginLogoutService;
 import com.masai.service.SellerService;

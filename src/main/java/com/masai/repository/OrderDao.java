@@ -8,12 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.masai.exception.CustomerNotFoundException;
-import com.masai.exception.OrderException;
-import com.masai.models.CartItem;
-import com.masai.models.Customer;
-import com.masai.models.Order;
-import com.masai.models.Product;
+import com.masai.model.Customer;
+import com.masai.model.Order;
 
 @Repository
 public interface OrderDao extends JpaRepository<Order, Integer> {

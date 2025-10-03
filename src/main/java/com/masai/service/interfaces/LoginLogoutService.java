@@ -1,9 +1,9 @@
-package com.masai.service;
+package com.masai.service.interfaces;
 
-import com.masai.models.CustomerDTO;
-import com.masai.models.SellerDTO;
-import com.masai.models.SessionDTO;
-import com.masai.models.UserSession;
+import com.masai.dto.CustomerDTO;
+import com.masai.dto.SellerDTO;
+import com.masai.dto.SessionDTO;
+import com.masai.model.UserSession;
 
 
 public interface LoginLogoutService {

@@ -1,4 +1,4 @@
-package com.masai.models;
+package com.masai.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

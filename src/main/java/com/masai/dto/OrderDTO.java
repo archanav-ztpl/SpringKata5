@@ -1,9 +1,7 @@
-package com.masai.models;
+package com.masai.dto;
 
 import javax.persistence.Embedded;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.CreditCardNumber;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.masai.exception.LoginException;
 import com.masai.exception.SellerException;
-import com.masai.models.Seller;
-import com.masai.models.SellerDTO;
-import com.masai.models.SessionDTO;
-import com.masai.models.UserSession;
+import com.masai.model.Seller;
+import com.masai.dto.SellerDTO;
+import com.masai.dto.SessionDTO;
+import com.masai.model.UserSession;
 import com.masai.repository.SellerDao;
 import com.masai.repository.SessionDao;
 

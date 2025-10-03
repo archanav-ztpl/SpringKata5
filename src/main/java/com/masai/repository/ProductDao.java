@@ -7,10 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.masai.models.CategoryEnum;
-import com.masai.models.Product;
-import com.masai.models.ProductDTO;
-import com.masai.models.ProductStatus;
+import com.masai.model.CategoryEnum;
+import com.masai.model.Product;
+import com.masai.model.ProductDTO;
+import com.masai.model.ProductStatus;
 
 
 @Repository

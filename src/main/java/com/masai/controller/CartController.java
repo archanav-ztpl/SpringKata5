@@ -1,7 +1,5 @@
 package com.masai.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.masai.models.Cart;
-import com.masai.models.CartDTO;
-import com.masai.models.CartItem;
+import com.masai.model.Cart;
+import com.masai.dto.CartDTO;
 import com.masai.repository.CartDao;
 import com.masai.repository.CustomerDao;
-import com.masai.service.CartService;
+import com.masai.service.interfaces.CartService;
 
 @RestController
 public class CartController {

@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.masai.exception.ProductNotFoundException;
-import com.masai.models.CartDTO;
-import com.masai.models.CartItem;
-import com.masai.models.Product;
-import com.masai.models.ProductStatus;
+import com.masai.dto.CartDTO;
+import com.masai.model.CartItem;
+import com.masai.model.Product;
+import com.masai.model.ProductStatus;
 import com.masai.repository.ProductDao;
 
 @Service

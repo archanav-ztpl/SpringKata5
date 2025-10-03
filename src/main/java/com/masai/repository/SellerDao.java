@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.masai.models.Seller;
+import com.masai.model.Seller;
 
 public interface SellerDao extends JpaRepository<Seller, Integer> {
 	

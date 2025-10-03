@@ -16,13 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.masai.models.CategoryEnum;
-import com.masai.models.Product;
-import com.masai.models.ProductDTO;
-import com.masai.models.ProductStatus;
+import com.masai.model.CategoryEnum;
+import com.masai.model.Product;
+import com.masai.model.ProductDTO;
+import com.masai.model.ProductStatus;
 import com.masai.service.ProductService;
-
-import io.swagger.v3.oas.models.security.SecurityScheme.In;
 
 @RestController
 public class ProductController {

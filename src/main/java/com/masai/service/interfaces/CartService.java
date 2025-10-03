@@ -1,14 +1,9 @@
-package com.masai.service;
+package com.masai.service.interfaces;
 
-import java.util.List;
-
-import com.masai.controller.ProductNotFound;
+import com.masai.exception.ProductNotFound;
 import com.masai.exception.CartItemNotFound;
-import com.masai.models.Cart;
-import com.masai.models.CartDTO;
-import com.masai.models.CartItem;
-
-
+import com.masai.model.Cart;
+import com.masai.dto.CartDTO;
 
 
 public interface CartService {

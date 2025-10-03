@@ -1,4 +1,4 @@
-package com.masai.models;
+package com.masai.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

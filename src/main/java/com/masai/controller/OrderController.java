@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.masai.models.Customer;
-import com.masai.models.Order;
-import com.masai.models.OrderDTO;
+import com.masai.model.Customer;
+import com.masai.model.Order;
+import com.masai.model.OrderDTO;
 import com.masai.repository.OrderDao;
 import com.masai.service.OrderService;
 

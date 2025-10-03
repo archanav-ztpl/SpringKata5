@@ -12,7 +12,7 @@ import com.masai.model.Customer;
 import com.masai.model.Order;
 
 @Repository
-public interface OrderDao extends JpaRepository<Order, Integer> {
+public interface OrderRepository extends JpaRepository<Order, Integer> {
 	public List<Order> findByDate(LocalDate date);
 	
 //	@Query("select c.orders from Customer c where c.customerId = customerId")

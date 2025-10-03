@@ -9,19 +9,19 @@ import com.masai.dto.CartDTO;
 import com.masai.model.CartItem;
 import com.masai.model.Product;
 import com.masai.model.ProductStatus;
-import com.masai.repository.ProductDao;
+import com.masai.repository.ProductRepository;
 
 @Service
 public class CartItemServiceImpl implements CartItemService {
 
 	@Autowired
-	ProductDao productDao;
+    ProductRepository productRepository;
 
 	@Override
-	public CartItem createItemforCart(CartDTO cartdto) {
-		
-		Product existingProduct = productDao.findById(cartdto.getProductId()).orElseThrow( () -> new ProductNotFoundException("Product Not found"));
-		
+	public CartItem createItemForCart(CartDTO cartDto) {
+
+		Product existingProduct = productRepository.findById(cartDto.getProductId()).orElseThrow( () -> new ProductNotFoundException("Product Not found"));
+
 		if(existingProduct.getStatus().equals(ProductStatus.OUTOFSTOCK) || existingProduct.getQuantity() == 0) {
 			throw new ProductNotFoundException("Product OUT OF STOCK");
 		}
@@ -36,14 +36,14 @@ public class CartItemServiceImpl implements CartItemService {
 	}
 	
 //	@Override
-//	public CartItem addItemToCart(CartDTO cartdto) {
-//		
+//	public CartItem addItemToCart(CartDTO cartDto) {
+//
 //		// TODO Auto-generated method stub
 //		
-////		Product existingProduct = productDao.findById(cartdto.getProductId()).orElseThrow( () -> new ProductException("Product Not found"));
-//		
-//		Optional<Product> opt = productDao.findById(cartdto.getProductId());
-//		
+////		Product existingProduct = productRepository.findById(cartDto.getProductId()).orElseThrow( () -> new ProductException("Product Not found"));
+//
+//		Optional<Product> opt = productRepository.findById(cartDto.getProductId());
+//
 //		if(opt.isEmpty())
 //			throw new ProductNotFoundException("Product not found");
 //		

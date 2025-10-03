@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.masai.repository.ProductRepository;
 import com.masai.service.interfaces.CartItemService;
 import com.masai.service.interfaces.CartService;
 import com.masai.service.interfaces.LoginLogoutService;
@@ -18,33 +19,32 @@ import com.masai.dto.CartDTO;
 import com.masai.model.CartItem;
 import com.masai.model.Customer;
 import com.masai.model.UserSession;
-import com.masai.repository.CartDao;
-import com.masai.repository.CustomerDao;
-import com.masai.repository.ProductDao;
-import com.masai.repository.SessionDao;
+import com.masai.repository.CartRepository;
+import com.masai.repository.CustomerRepository;
+import com.masai.repository.SessionRepository;
 
 @Service
 public class CartServiceImpl implements CartService {
 
 	@Autowired
-	private CartDao cartDao;
+	private CartRepository cartRepository;
 	
 	@Autowired
-	private SessionDao sessionDao;
+	private SessionRepository sessionRepository;
 	
 	@Autowired
 	private CartItemService cartItemService;
 	
 	
 	@Autowired
-	private CustomerDao customerDao;
+	private CustomerRepository customerRepository;
 	
 	@Autowired
 	private LoginLogoutService loginService;
 	
 	
 	@Autowired
-	private ProductDao productDao;
+	private ProductRepository productRepository;
 
 	@Override
 	public Cart addProductToCart(CartDTO cartDto, String token) {
@@ -56,9 +56,9 @@ public class CartServiceImpl implements CartService {
 		
 		loginService.checkTokenStatus(token);
 		
-		UserSession user = sessionDao.findByToken(token).get();
+		UserSession user = sessionRepository.findByToken(token).get();
 		
-		Optional<Customer> opt = customerDao.findById(user.getUserId());
+		Optional<Customer> opt = customerRepository.findById(user.getUserId());
 		
 		if(opt.isEmpty())
 			throw new CustomerNotFoundException("Customer does not exist");
@@ -69,8 +69,8 @@ public class CartServiceImpl implements CartService {
 		
 		List<CartItem> cartItems = customerCart.getCartItems();
 		
-		CartItem item = cartItemService.createItemforCart(cartDto);
-		
+		CartItem item = cartItemService.createItemForCart(cartDto);
+
 		
 		if(cartItems.size() == 0) {
 			cartItems.add(item);
@@ -91,7 +91,7 @@ public class CartServiceImpl implements CartService {
 			}
 		}
 		
-		return cartDao.save(existingCustomer.getCustomerCart());
+		return cartRepository.save(existingCustomer.getCustomerCart());
 		
 
 }
@@ -109,9 +109,9 @@ public class CartServiceImpl implements CartService {
 		
 		loginService.checkTokenStatus(token);
 		
-		UserSession user = sessionDao.findByToken(token).get();
+		UserSession user = sessionRepository.findByToken(token).get();
 		
-		Optional<Customer> opt = customerDao.findById(user.getUserId());
+		Optional<Customer> opt = customerRepository.findById(user.getUserId());
 		
 		
 		if(opt.isEmpty())
@@ -128,7 +128,7 @@ public class CartServiceImpl implements CartService {
 		Integer cartId = existingCustomer.getCustomerCart().getCartId();
 		
 		
-		Optional<Cart> optCart= cartDao.findById(cartId);
+		Optional<Cart> optCart= cartRepository.findById(cartId);
 		
 		if(optCart.isEmpty()) {
 			throw new CartItemNotFound("cart Not found by Id");
@@ -149,9 +149,9 @@ public class CartServiceImpl implements CartService {
 		
 		loginService.checkTokenStatus(token);
 		
-		UserSession user = sessionDao.findByToken(token).get();
+		UserSession user = sessionRepository.findByToken(token).get();
 		
-		Optional<Customer> opt = customerDao.findById(user.getUserId());
+		Optional<Customer> opt = customerRepository.findById(user.getUserId());
 		
 		if(opt.isEmpty())
 			throw new CustomerNotFoundException("Customer does not exist");
@@ -180,7 +180,7 @@ public class CartServiceImpl implements CartService {
 					cartItems.remove(c);
 
 					
-					return cartDao.save(customerCart);
+					return cartRepository.save(customerCart);
 				}
 				flag = true;
 			}
@@ -191,11 +191,11 @@ public class CartServiceImpl implements CartService {
 		}
 		
 		if(cartItems.size() == 0) {
-			cartDao.save(customerCart);
+			cartRepository.save(customerCart);
 			throw new CartItemNotFound("Cart is empty now");
 		}
 		
-		return cartDao.save(customerCart);
+		return cartRepository.save(customerCart);
 	}
 	
 	
@@ -212,9 +212,9 @@ public class CartServiceImpl implements CartService {
 		
 		loginService.checkTokenStatus(token);
 		
-		UserSession user = sessionDao.findByToken(token).get();
+		UserSession user = sessionRepository.findByToken(token).get();
 		
-		Optional<Customer> opt = customerDao.findById(user.getUserId());
+		Optional<Customer> opt = customerRepository.findById(user.getUserId());
 		
 		if(opt.isEmpty())
 			throw new CustomerNotFoundException("Customer does not exist");
@@ -233,7 +233,7 @@ public class CartServiceImpl implements CartService {
 		
 		customerCart.setCartTotal(0.0);
 		
-		return cartDao.save(customerCart);
+		return cartRepository.save(customerCart);
 	}
 	
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.masai.model.Customer;
 
 @Repository
-public interface CustomerDao extends JpaRepository<Customer, Integer>{
+public interface CustomerRepository extends JpaRepository<Customer, Integer>{
 	
 	Optional<Customer> findByMobileNo(String mobileNo);
 	

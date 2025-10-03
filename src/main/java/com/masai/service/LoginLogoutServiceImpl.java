@@ -18,22 +18,22 @@ import com.masai.model.Seller;
 import com.masai.dto.SellerDTO;
 import com.masai.dto.SessionDTO;
 import com.masai.model.UserSession;
-import com.masai.repository.CustomerDao;
-import com.masai.repository.SellerDao;
-import com.masai.repository.SessionDao;
+import com.masai.repository.CustomerRepository;
+import com.masai.repository.SellerRepository;
+import com.masai.repository.SessionRepository;
 
 @Service
 public class LoginLogoutServiceImpl implements LoginLogoutService {
 
 	
 	@Autowired
-	private SessionDao sessionDao;
+	private SessionRepository sessionRepository;
 	
 	@Autowired
-	private CustomerDao customerDao;
+	private CustomerRepository customerRepository;
 	
 	@Autowired
-	private SellerDao sellerDao;
+	private SellerRepository sellerRepository;
 
  
 	
@@ -42,21 +42,21 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 	@Override
 	public UserSession loginCustomer(CustomerDTO loginCustomer) {
 		
-		Optional<Customer> res = customerDao.findByMobileNo(loginCustomer.getMobileId());
+		Optional<Customer> res = customerRepository.findByMobileNo(loginCustomer.getMobileId());
 		
 		if(res.isEmpty())
 			throw new CustomerNotFoundException("Customer record does not exist with given mobile number");
 		
 		Customer existingCustomer = res.get();
 		
-		Optional<UserSession> opt = sessionDao.findByUserId(existingCustomer.getCustomerId());
+		Optional<UserSession> opt = sessionRepository.findByUserId(existingCustomer.getCustomerId());
 		
 		if(opt.isPresent()) {
 			
 			UserSession user = opt.get();
 			
 			if(user.getSessionEndTime().isBefore(LocalDateTime.now())) {
-				sessionDao.delete(user);	
+				sessionRepository.delete(user);
 			}
 			else
 				throw new LoginException("User already logged in");
@@ -78,7 +78,7 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 			
 			newSession.setToken(token);
 			
-			return sessionDao.save(newSession);
+			return sessionRepository.save(newSession);
 		}
 		else {
 			throw new LoginException("Password Incorrect. Try again.");
@@ -95,14 +95,14 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 		
 		checkTokenStatus(token);
 		
-		Optional<UserSession> opt = sessionDao.findByToken(token);
+		Optional<UserSession> opt = sessionRepository.findByToken(token);
 		
 		if(!opt.isPresent())
 			throw new LoginException("User not logged in. Invalid session token. Login Again.");
 		
 		UserSession session = opt.get();
 		
-		sessionDao.delete(session);
+		sessionRepository.delete(session);
 		
 		sessionToken.setMessage("Logged out sucessfully.");
 		
@@ -117,14 +117,14 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 	@Override
 	public void checkTokenStatus(String token) {
 		
-		Optional<UserSession> opt = sessionDao.findByToken(token);
+		Optional<UserSession> opt = sessionRepository.findByToken(token);
 		
 		if(opt.isPresent()) {
 			UserSession session = opt.get();
 			LocalDateTime endTime = session.getSessionEndTime();
 			boolean flag = false;
 			if(endTime.isBefore(LocalDateTime.now())) {
-				sessionDao.delete(session);
+				sessionRepository.delete(session);
 				flag = true;
 			}
 			
@@ -144,21 +144,21 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 	@Override
 	public UserSession loginSeller(SellerDTO seller) {
 		
-		Optional<Seller> res = sellerDao.findByMobile(seller.getMobile());
+		Optional<Seller> res = sellerRepository.findByMobile(seller.getMobile());
 		
 		if(res.isEmpty())
 			throw new SellerNotFoundException("Seller record does not exist with given mobile number");
 		
 		Seller existingSeller = res.get();
 		
-		Optional<UserSession> opt = sessionDao.findByUserId(existingSeller.getSellerId());
+		Optional<UserSession> opt = sessionRepository.findByUserId(existingSeller.getSellerId());
 		
 		if(opt.isPresent()) {
 			
 			UserSession user = opt.get();
 			
 			if(user.getSessionEndTime().isBefore(LocalDateTime.now())) {
-				sessionDao.delete(user);	
+				sessionRepository.delete(user);
 			}
 			else
 				throw new LoginException("User already logged in");
@@ -180,7 +180,7 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 			
 			newSession.setToken(token);
 			
-			return sessionDao.save(newSession);
+			return sessionRepository.save(newSession);
 		}
 		else {
 			throw new LoginException("Password Incorrect. Try again.");
@@ -197,14 +197,14 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 		
 		checkTokenStatus(token);
 		
-		Optional<UserSession> opt = sessionDao.findByToken(token);
+		Optional<UserSession> opt = sessionRepository.findByToken(token);
 		
 		if(!opt.isPresent())
 			throw new LoginException("User not logged in. Invalid session token. Login Again.");
 		
 		UserSession user = opt.get();
 		
-		sessionDao.delete(user);
+		sessionRepository.delete(user);
 		
 		session.setMessage("Logged out sucessfully.");
 		
@@ -219,7 +219,7 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 		
 		System.out.println("Inside delete tokens");
 		
-		List<UserSession> users = sessionDao.findAll();
+		List<UserSession> users = sessionRepository.findAll();
 		
 		System.out.println(users);
 		
@@ -229,7 +229,7 @@ public class LoginLogoutServiceImpl implements LoginLogoutService {
 				LocalDateTime endTime = user.getSessionEndTime();
 				if(endTime.isBefore(LocalDateTime.now())) {
 					System.out.println(user.getUserId());
-					sessionDao.delete(user);
+					sessionRepository.delete(user);
 				}
 			}
 		}

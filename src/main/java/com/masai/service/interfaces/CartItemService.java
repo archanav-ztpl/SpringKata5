@@ -5,6 +5,6 @@ import com.masai.model.CartItem;
 
 public interface CartItemService {
 	
-	public CartItem createItemforCart(CartDTO cartdto);
-	
+	public CartItem createItemForCart(CartDTO cartDto);
+
 }

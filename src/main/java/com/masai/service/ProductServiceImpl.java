@@ -15,20 +15,20 @@ import com.masai.model.Product;
 import com.masai.dto.ProductDTO;
 import com.masai.model.ProductStatus;
 import com.masai.model.Seller;
-import com.masai.repository.ProductDao;
-import com.masai.repository.SellerDao;
+import com.masai.repository.ProductRepository;
+import com.masai.repository.SellerRepository;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
 	@Autowired
-	private ProductDao prodDao;
+	private ProductRepository prodDao;
 
 	@Autowired
 	private SellerService sService;
 
 	@Autowired
-	private SellerDao sDao;
+	private SellerRepository sDao;
 
 	@Override
 	public Product addProductToCatalog(String token, Product product) {

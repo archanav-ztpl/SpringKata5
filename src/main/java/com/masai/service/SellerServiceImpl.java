@@ -14,26 +14,26 @@ import com.masai.model.Seller;
 import com.masai.dto.SellerDTO;
 import com.masai.dto.SessionDTO;
 import com.masai.model.UserSession;
-import com.masai.repository.SellerDao;
-import com.masai.repository.SessionDao;
+import com.masai.repository.SellerRepository;
+import com.masai.repository.SessionRepository;
 
 @Service
 public class SellerServiceImpl implements SellerService {
 	
 	@Autowired
-	private SellerDao sellerDao;
+	private SellerRepository sellerRepository;
 	
 	@Autowired
 	private LoginLogoutService loginService;
 	
 	@Autowired
-	private SessionDao sessionDao;
+	private SessionRepository sessionRepository;
 	
 
 	@Override
 	public Seller addSeller(Seller seller) {
 		
-		Seller add= sellerDao.save(seller);
+		Seller add= sellerRepository.save(seller);
 		
 		return add;
 	}
@@ -41,7 +41,7 @@ public class SellerServiceImpl implements SellerService {
 	@Override
 	public List<Seller> getAllSellers() throws SellerException {
 		
-		List<Seller> sellers= sellerDao.findAll();
+		List<Seller> sellers= sellerRepository.findAll();
 		
 		if(sellers.size()>0) {
 			return sellers;
@@ -53,7 +53,7 @@ public class SellerServiceImpl implements SellerService {
 	@Override
 	public Seller getSellerById(Integer sellerId) {
 		
-		Optional<Seller> seller=sellerDao.findById(sellerId);
+		Optional<Seller> seller= sellerRepository.findById(sellerId);
 		
 		if(seller.isPresent()) {
 			return seller.get();
@@ -64,44 +64,43 @@ public class SellerServiceImpl implements SellerService {
 	@Override
 	public Seller updateSeller(Seller seller, String token) {
 		
-		if(token.contains("seller") == false) {
+		if(!token.contains("seller")) {
 			throw new LoginException("Invalid session token for seller");
 		}
 		
 		loginService.checkTokenStatus(token);
 		
-		Seller existingSeller=sellerDao.findById(seller.getSellerId()).orElseThrow(()-> new SellerException("Seller not found for this Id: "+seller.getSellerId()));
-		Seller newSeller= sellerDao.save(seller);
+		Seller existingSeller= sellerRepository.findById(seller.getSellerId()).orElseThrow(()-> new SellerException("Seller not found for this Id: "+seller.getSellerId()));
+		Seller newSeller= sellerRepository.save(seller);
 		return newSeller;
 	}
 
 	@Override
-	public Seller deleteSellerById(Integer sellerId, String token) {
+	public void deleteSellerById(Integer sellerId, String token) {
 		
-		if(token.contains("seller") == false) {
+		if(!token.contains("seller")) {
 			throw new LoginException("Invalid session token for seller");
 		}
 		
 		loginService.checkTokenStatus(token);
 		
-		Optional<Seller> opt=sellerDao.findById(sellerId);
+		Optional<Seller> opt= sellerRepository.findById(sellerId);
 		
 		if(opt.isPresent()) {
 			
-			UserSession user = sessionDao.findByToken(token).get();
+			UserSession user = sessionRepository.findByToken(token).get();
 			
 			Seller existingseller=opt.get();
 			
-			if(user.getUserId() == existingseller.getSellerId()) {
-				sellerDao.delete(existingseller);
+			if(user.getUserId().equals(existingseller.getSellerId())) {
+				sellerRepository.delete(existingseller);
 				
 				// logic to log out a seller after he deletes his account
 				SessionDTO session = new SessionDTO();
 				session.setToken(token);
 				loginService.logoutSeller(session);
-				
-				return existingseller;
-			}
+
+            }
 			else {
 				throw new SellerException("Verification Error in deleting seller account");
 			}
@@ -111,38 +110,37 @@ public class SellerServiceImpl implements SellerService {
 	}
 
 	@Override
-	public Seller updateSellerMobile(SellerDTO sellerdto, String token) throws SellerException {
-		
-		if(token.contains("seller") == false) {
+	public Seller updateSellerMobile(SellerDTO sellerDTO, String token) throws SellerException {
+
+		if(!token.contains("seller")) {
 			throw new LoginException("Invalid session token for seller");
 		}
 		
 		loginService.checkTokenStatus(token);
 		
-		UserSession user = sessionDao.findByToken(token).get();
+		UserSession user = sessionRepository.findByToken(token).get();
 		
-		Seller existingSeller=sellerDao.findById(user.getUserId()).orElseThrow(()->new SellerException("Seller not found for this ID: "+ user.getUserId()));
+		Seller existingSeller= sellerRepository.findById(user.getUserId()).orElseThrow(()->new SellerException("Seller not found for this ID: "+ user.getUserId()));
 		
-		if(existingSeller.getPassword().equals(sellerdto.getPassword())) {
-			existingSeller.setMobile(sellerdto.getMobile());
-			return sellerDao.save(existingSeller);
+		if(existingSeller.getPassword().equals(sellerDTO.getPassword())) {
+			existingSeller.setMobile(sellerDTO.getMobile());
+			return sellerRepository.save(existingSeller);
 		}
 		else {
 			throw new SellerException("Error occured in updating mobile. Please enter correct password");
 		}
-		
 	}
 
 	@Override
 	public Seller getSellerByMobile(String mobile, String token) throws SellerException {
 		
-		if(token.contains("seller") == false) {
+		if(!token.contains("seller")) {
 			throw new LoginException("Invalid session token for seller");
 		}
 		
 		loginService.checkTokenStatus(token);
 		
-		Seller existingSeller = sellerDao.findByMobile(mobile).orElseThrow( () -> new SellerException("Seller not found with given mobile"));
+		Seller existingSeller = sellerRepository.findByMobile(mobile).orElseThrow( () -> new SellerException("Seller not found with given mobile"));
 		
 		return existingSeller;
 	}
@@ -150,15 +148,15 @@ public class SellerServiceImpl implements SellerService {
 	@Override
 	public Seller getCurrentlyLoggedInSeller(String token) throws SellerException{
 		
-		if(token.contains("seller") == false) {
+		if(!token.contains("seller")) {
 			throw new LoginException("Invalid session token for seller");
 		}
 		
 		loginService.checkTokenStatus(token);
 		
-		UserSession user = sessionDao.findByToken(token).get();
+		UserSession user = sessionRepository.findByToken(token).get();
 		
-		Seller existingSeller=sellerDao.findById(user.getUserId()).orElseThrow(()->new SellerException("Seller not found for this ID"));
+		Seller existingSeller= sellerRepository.findById(user.getUserId()).orElseThrow(()->new SellerException("Seller not found for this ID"));
 		
 		return existingSeller;
 		
@@ -169,31 +167,31 @@ public class SellerServiceImpl implements SellerService {
 	
 	@Override
 	public SessionDTO updateSellerPassword(SellerDTO sellerDTO, String token) {
-				
-		if(token.contains("seller") == false) {
+
+		if(!token.contains("seller")) {
 			throw new LoginException("Invalid session token for seller");
 		}
-			
-			
+
+
 		loginService.checkTokenStatus(token);
 			
-		UserSession user = sessionDao.findByToken(token).get();
+		UserSession user = sessionRepository.findByToken(token).get();
 			
-		Optional<Seller> opt = sellerDao.findById(user.getUserId());
+		Optional<Seller> opt = sellerRepository.findById(user.getUserId());
 			
 		if(opt.isEmpty())
 			throw new SellerException("Seller does not exist");
 			
 		Seller existingSeller = opt.get();
 			
-			
-		if(sellerDTO.getMobile().equals(existingSeller.getMobile()) == false) {
+
+		if(!sellerDTO.getMobile().equals(existingSeller.getMobile())) {
 			throw new SellerException("Verification error. Mobile number does not match");
 		}
 			
 		existingSeller.setPassword(sellerDTO.getPassword());
 			
-		sellerDao.save(existingSeller);
+		sellerRepository.save(existingSeller);
 			
 		SessionDTO session = new SessionDTO();
 			

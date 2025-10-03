@@ -14,19 +14,19 @@ import com.masai.model.ProductStatus;
 
 
 @Repository
-public interface ProductDao extends JpaRepository<Product, Integer> {
+public interface ProductRepository extends JpaRepository<Product, Integer> {
 	
 	
-	@Query("select new com.masai.models.ProductDTO(p.productName,p.manufacturer,p.price,p.quantity) "
-			+ "from Product p where p.category=:catenum")
-	public List<ProductDTO> getAllProductsInACategory(@Param("catenum") CategoryEnum catenum);
+	@Query("select new com.masai.dto.ProductDTO(p.productName,p.manufacturer,p.price,p.quantity) "
+			+ "from Product p where p.category=:categoryEnum")
+	public List<ProductDTO> getAllProductsInACategory(@Param("categoryEnum") CategoryEnum categoryEnum);
 	
 	
-	@Query("select new com.masai.models.ProductDTO(p.productName,p.manufacturer,p.price,p.quantity) "
+	@Query("select new com.masai.dto.ProductDTO(p.productName,p.manufacturer,p.price,p.quantity) "
 			+ "from Product p where p.status=:status")
 	public List<ProductDTO> getProductsWithStatus(@Param("status") ProductStatus status);
 	
-	@Query("select new com.masai.models.ProductDTO(p.productName,p.manufacturer,p.price,p.quantity) "
+	@Query("select new com.masai.dto.ProductDTO(p.productName,p.manufacturer,p.price,p.quantity) "
 			+ "from Product p where p.seller.sellerId=:id")
 	public List<ProductDTO> getProductsOfASeller(@Param("id") Integer id);
 	

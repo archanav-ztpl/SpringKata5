@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.masai.model.Cart;
 
 @Repository
-public interface CartDao extends JpaRepository<Cart,Integer> {
+public interface CartRepository extends JpaRepository<Cart,Integer> {
 
 //	public Map<Product,Integer> findbyName(String productName);
 //	public Cart findbyId(Integer cartId);

@@ -19,32 +19,32 @@ import com.masai.model.Order;
 import com.masai.dto.OrderDTO;
 import com.masai.model.OrderStatusValues;
 import com.masai.model.ProductStatus;
-import com.masai.repository.OrderDao;
+import com.masai.repository.OrderRepository;
 
 @Service
 public class OrderServiceImpl implements OrderService {
 	@Autowired
-	private OrderDao oDao;
+	private OrderRepository orderRepository;
 	
 	@Autowired
-	private CustomerService cs;
+	private CustomerService customerService;
 	
 	@Autowired
-	private CartServiceImpl cartservicei;
+	private CartServiceImpl cartService;
 	
 	
 	@Override
-	public Order saveOrder(OrderDTO odto,String token) throws LoginException, OrderException {
+	public Order saveOrder(OrderDTO orderDTO,String token) throws LoginException, OrderException {
 		
 		Order newOrder= new Order();
 		
-		Customer loggedInCustomer= cs.getLoggedInCustomerDetails(token);
+		Customer loggedInCustomer= customerService.getLoggedInCustomerDetails(token);
 		
 		if(loggedInCustomer != null) {
 			//Customer loggedInCustomer= cs.getLoggedInCustomerDetails(token);
 			newOrder.setCustomer(loggedInCustomer);
 			String usersCardNumber= loggedInCustomer.getCreditCard().getCardNumber();
-			String userGivenCardNumber= odto.getCardNumber().getCardNumber();
+			String userGivenCardNumber= orderDTO.getCardNumber().getCardNumber();
 			List<CartItem> productsInCart= loggedInCustomer.getCustomerCart().getCartItems();
 			List<CartItem> productsInOrder = new ArrayList<>(productsInCart);
 			
@@ -52,15 +52,14 @@ public class OrderServiceImpl implements OrderService {
 			newOrder.setTotal(loggedInCustomer.getCustomerCart().getCartTotal());
 			
 			
-			
 			if(productsInCart.size()!=0) {
 				if((usersCardNumber.equals(userGivenCardNumber)) 
-						&& (odto.getCardNumber().getCardValidity().equals(loggedInCustomer.getCreditCard().getCardValidity())
-								&& (odto.getCardNumber().getCardCVV().equals(loggedInCustomer.getCreditCard().getCardCVV())))) {
-					
+						&& (orderDTO.getCardNumber().getCardValidity().equals(loggedInCustomer.getCreditCard().getCardValidity())
+							&& (orderDTO.getCardNumber().getCardCVV().equals(loggedInCustomer.getCreditCard().getCardCVV())))) {
+
 					//System.out.println(usersCardNumber);
-					newOrder.setCardNumber(odto.getCardNumber().getCardNumber());
-					newOrder.setAddress(loggedInCustomer.getAddress().get(odto.getAddressType()));
+					newOrder.setCardNumber(orderDTO.getCardNumber().getCardNumber());
+					newOrder.setAddress(loggedInCustomer.getAddress().get(orderDTO.getAddressType()));
 					newOrder.setDate(LocalDate.now());
 					newOrder.setOrderStatus(OrderStatusValues.SUCCESS);
 					System.out.println(usersCardNumber);
@@ -69,9 +68,9 @@ public class OrderServiceImpl implements OrderService {
 					for(CartItem cartItem : cartItemsList ) {
 						Integer remainingQuantity = cartItem.getCartProduct().getQuantity()-cartItem.getCartItemQuantity();
 						if(remainingQuantity < 0 || cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
-							CartDTO cartdto = new CartDTO();
-							cartdto.setProductId(cartItem.getCartProduct().getProductId());
-							cartservicei.removeProductFromCart(cartdto, token);
+							CartDTO cartDto = new CartDTO();
+							cartDto.setProductId(cartItem.getCartProduct().getProductId());
+							cartService.removeProductFromCart(cartDto, token);
 							throw new OrderException("Product "+ cartItem.getCartProduct().getProductName() + " OUT OF STOCK");
 						}
 						cartItem.getCartProduct().setQuantity(remainingQuantity);
@@ -79,18 +78,18 @@ public class OrderServiceImpl implements OrderService {
 							cartItem.getCartProduct().setStatus(ProductStatus.OUTOFSTOCK);
 						}
 					}
-					cartservicei.clearCart(token);
+					cartService.clearCart(token);
 					//System.out.println(newOrder);
-					return oDao.save(newOrder);
+					return orderRepository.save(newOrder);
 				}
 				else {
 					System.out.println("Not same");
 					newOrder.setCardNumber(null);
-					newOrder.setAddress(loggedInCustomer.getAddress().get(odto.getAddressType()));
+					newOrder.setAddress(loggedInCustomer.getAddress().get(orderDTO.getAddressType()));
 					newOrder.setDate(LocalDate.now());
 					newOrder.setOrderStatus(OrderStatusValues.PENDING);
-					cartservicei.clearCart(token);
-					return oDao.save(newOrder);
+					cartService.clearCart(token);
+					return orderRepository.save(newOrder);
 					
 				}
 			}
@@ -105,15 +104,15 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Order getOrderByOrderId(Integer OrderId) throws OrderException {
-		return oDao.findById(OrderId).orElseThrow(()-> new OrderException("No order exists with given OrderId "+ OrderId));
-		
+	public Order getOrderByOrderId(Integer orderId) throws OrderException {
+		return orderRepository.findById(orderId).orElseThrow(()-> new OrderException("No order exists with given OrderId "+ orderId));
+
 	}
 
 	@Override
 	public List<Order> getAllOrders() throws OrderException {
 		// TODO Auto-generated method stub
-		List<Order> orders = oDao.findAll();
+		List<Order> orders = orderRepository.findAll();
 		if(orders.size()>0)
 			return orders;
 		else
@@ -121,12 +120,12 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Order cancelOrderByOrderId(Integer OrderId,String token) throws OrderException {
-		Order order= oDao.findById(OrderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ OrderId));
-		if(order.getCustomer().getCustomerId()==cs.getLoggedInCustomerDetails(token).getCustomerId()) {
+	public Order cancelOrderByOrderId(Integer orderId,String token) throws OrderException {
+		Order order= orderRepository.findById(orderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ orderId));
+		if(order.getCustomer().getCustomerId()== customerService.getLoggedInCustomerDetails(token).getCustomerId()) {
 			if(order.getOrderStatus()==OrderStatusValues.PENDING) {
 				order.setOrderStatus(OrderStatusValues.CANCELLED);
-				oDao.save(order);
+				orderRepository.save(order);
 				return order;
 			}
 			else if(order.getOrderStatus()==OrderStatusValues.SUCCESS) {
@@ -141,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
 					}
 				}
 				
-				oDao.save(order);
+				orderRepository.save(order);
 				return order;
 			}
 			else {
@@ -156,29 +155,29 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Order updateOrderByOrder(OrderDTO orderdto, Integer OrderId,String token) throws OrderException,LoginException {
-		Order existingOrder= oDao.findById(OrderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ OrderId));
-		
-		if(existingOrder.getCustomer().getCustomerId()==cs.getLoggedInCustomerDetails(token).getCustomerId()) {
-			//existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
-			//existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
-			Customer loggedInCustomer = cs.getLoggedInCustomerDetails(token);
+	public Order updateOrderByOrder(OrderDTO orderDTO, Integer orderId, String token) throws OrderException,LoginException {
+		Order existingOrder= orderRepository.findById(orderId).orElseThrow(()->new OrderException("No order exists with given OrderId "+ orderId));
+
+		if(existingOrder.getCustomer().getCustomerId()== customerService.getLoggedInCustomerDetails(token).getCustomerId()) {
+			//existingOrder.setCardNumber(orderDTO.getCardNumber().getCardNumber());
+			//existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderDTO.getAddressType()));
+			Customer loggedInCustomer = customerService.getLoggedInCustomerDetails(token);
 			String usersCardNumber= loggedInCustomer.getCreditCard().getCardNumber();
-			String userGivenCardNumber= orderdto.getCardNumber().getCardNumber();
+			String userGivenCardNumber= orderDTO.getCardNumber().getCardNumber();
 //			System.out.println(loggedInCustomer);
 			if((usersCardNumber.equals(userGivenCardNumber)) 
-					&& (orderdto.getCardNumber().getCardValidity().equals(loggedInCustomer.getCreditCard().getCardValidity())
-							&& (orderdto.getCardNumber().getCardCVV().equals(loggedInCustomer.getCreditCard().getCardCVV())))) {
-				existingOrder.setCardNumber(orderdto.getCardNumber().getCardNumber());
-				existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderdto.getAddressType()));
+					&& (orderDTO.getCardNumber().getCardValidity().equals(loggedInCustomer.getCreditCard().getCardValidity())
+						&& (orderDTO.getCardNumber().getCardCVV().equals(loggedInCustomer.getCreditCard().getCardCVV())))) {
+				existingOrder.setCardNumber(orderDTO.getCardNumber().getCardNumber());
+				existingOrder.setAddress(existingOrder.getCustomer().getAddress().get(orderDTO.getAddressType()));
 				existingOrder.setOrderStatus(OrderStatusValues.SUCCESS);
 				List<CartItem> cartItemsList= existingOrder.getOrdercartItems();
 				for(CartItem cartItem : cartItemsList ) {
 					Integer remainingQuantity = cartItem.getCartProduct().getQuantity()-cartItem.getCartItemQuantity();
 					if(remainingQuantity < 0 || cartItem.getCartProduct().getStatus() == ProductStatus.OUTOFSTOCK) {
-						CartDTO cartdto = new CartDTO();
-						cartdto.setProductId(cartItem.getCartProduct().getProductId());
-						cartservicei.removeProductFromCart(cartdto, token);
+						CartDTO cartDto = new CartDTO();
+						cartDto.setProductId(cartItem.getCartProduct().getProductId());
+						cartService.removeProductFromCart(cartDto, token);
 						throw new OrderException("Product "+ cartItem.getCartProduct().getProductName() + " OUT OF STOCK");
 					}
 					cartItem.getCartProduct().setQuantity(remainingQuantity);
@@ -186,7 +185,7 @@ public class OrderServiceImpl implements OrderService {
 						cartItem.getCartProduct().setStatus(ProductStatus.OUTOFSTOCK);
 					}
 				}
-				return oDao.save(existingOrder);
+				return orderRepository.save(existingOrder);
 			}
 			else {
 				throw new OrderException("Incorrect Card Number Again" + usersCardNumber + userGivenCardNumber);
@@ -203,17 +202,17 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	public List<Order> getAllOrdersByDate(LocalDate date) throws OrderException {
 		
-		List<Order> listOfOrdersOntheDay= oDao.findByDate(date);
+		List<Order> listOfOrdersOntheDay= orderRepository.findByDate(date);
 		return listOfOrdersOntheDay;
 	}
 
 	@Override
 	public Customer getCustomerByOrderid(Integer orderId) throws OrderException {
-		Optional<Order> opt= oDao.findById(orderId);
+		Optional<Order> opt= orderRepository.findById(orderId);
 		if(opt.isPresent()) {
 			Order existingorder= opt.get();
 			
-			return oDao.getCustomerByOrderid(existingorder.getCustomer().getCustomerId());
+			return orderRepository.getCustomerByOrderid(existingorder.getCustomer().getCustomerId());
 		}
 		else
 			throw new OrderException("No Order exists with orderId "+orderId);

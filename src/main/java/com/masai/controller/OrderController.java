@@ -22,67 +22,71 @@ import org.springframework.web.bind.annotation.RestController;
 import com.masai.model.Customer;
 import com.masai.model.Order;
 import com.masai.dto.OrderDTO;
-import com.masai.repository.OrderDao;
 import com.masai.service.interfaces.OrderService;
 
 @RestController
 public class OrderController {
-	@Autowired
-	private OrderDao oDao;
-	
-	@Autowired
-	private OrderService oService;
-	
-	@PostMapping("/order/place")
-	public ResponseEntity<Order> addTheNewOrder(@Valid @RequestBody OrderDTO odto,@RequestHeader("token") String token){
-		
-		Order savedorder = oService.saveOrder(odto,token);
-		return new ResponseEntity<Order>(savedorder,HttpStatus.CREATED);
-		
-	}
-	
-	@GetMapping("/orders")
-	public List<Order> getAllOrders(){
-		
-		
-		List<Order> listOfAllOrders = oService.getAllOrders();
-		return listOfAllOrders;
-		
-	}
-	
-	@GetMapping("/orders/{orderId}")
-	public Order getOrdersByOrderId(@PathVariable("orderId") Integer orderId) {
-		
-		return oService.getOrderByOrderId(orderId);
-		
-	}
-	
-	@DeleteMapping("/orders/{orderId}")
-	public Order cancelTheOrderByOrderId(@PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
-		
-		return oService.cancelOrderByOrderId(orderId,token);
-	}
-	
-	@PutMapping("/orders/{orderId}")
-	public ResponseEntity<Order> updateOrderByOrder(@Valid @RequestBody OrderDTO orderdto, @PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
-		
-		Order updatedOrder= oService.updateOrderByOrder(orderdto,orderId,token);
-		
-		return new ResponseEntity<Order>(updatedOrder,HttpStatus.ACCEPTED);
-		
-	}
-	
-	@GetMapping("/orders/by/date")
-	public List<Order> getOrdersByDate(@RequestParam("date") String date){
-		
-		DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd-MM-yyyy");
-		LocalDate ld=LocalDate.parse(date,dtf);
-		return oService.getAllOrdersByDate(ld);
-	}
-	
-	@GetMapping("/customer/{orderId}")
-	public Customer getCustomerDetailsByOrderId(@PathVariable("orderId") Integer orderId) {
-		return oService.getCustomerByOrderid(orderId);
-	}
+
+    private final OrderService orderService;
+
+    @Autowired
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping("/order/place")
+    public ResponseEntity<Order> addTheNewOrder(@Valid @RequestBody OrderDTO orderDto,@RequestHeader("token") String token){
+
+        Order saveOrder = orderService.saveOrder(orderDto,token);
+        return new ResponseEntity<Order>(saveOrder,HttpStatus.CREATED);
+
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<List<Order>> getAllOrders(){
+
+        List<Order> listOfAllOrders = orderService.getAllOrders();
+        return ResponseEntity.ok(listOfAllOrders);
+
+    }
+
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<Order> getOrdersByOrderId(@PathVariable("orderId") Integer orderId) {
+
+        Order order = orderService.getOrderByOrderId(orderId);
+        return ResponseEntity.ok(order);
+
+    }
+
+    @DeleteMapping("/orders/{orderId}")
+    public ResponseEntity<Order> cancelTheOrderByOrderId(@PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
+
+        Order cancelled = orderService.cancelOrderByOrderId(orderId,token);
+        return ResponseEntity.ok(cancelled);
+    }
+
+    @PutMapping("/orders/{orderId}")
+    public ResponseEntity<Order> updateOrderByOrder(@Valid @RequestBody OrderDTO orderDto, @PathVariable("orderId") Integer orderId,@RequestHeader("token") String token){
+
+        Order updatedOrder= orderService.updateOrderByOrder(orderDto,orderId,token);
+
+        return ResponseEntity.ok(updatedOrder);
+
+    }
+
+    @GetMapping("/orders/by/date")
+    public ResponseEntity<List<Order>> getOrdersByDate(@RequestParam("date") String date){
+
+        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate ld=LocalDate.parse(date,dtf);
+        List<Order> orders = orderService.getAllOrdersByDate(ld);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/customer/{orderId}")
+    public ResponseEntity<Customer> getCustomerDetailsByOrderId(@PathVariable("orderId") Integer orderId) {
+        Customer customer = orderService.getCustomerByOrderid(orderId);
+        return ResponseEntity.ok(customer);
+    }
 
 }

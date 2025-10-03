@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.masai.service.interfaces.CartItemService;
+import com.masai.service.interfaces.CartService;
+import com.masai.service.interfaces.LoginLogoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

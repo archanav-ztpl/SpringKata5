@@ -1,5 +1,6 @@
 package com.masai.service;
 
+import com.masai.service.interfaces.CartItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ import com.masai.model.ProductStatus;
 import com.masai.repository.ProductDao;
 
 @Service
-public class CartItemServiceImpl implements CartItemService{
+public class CartItemServiceImpl implements CartItemService {
 
 	@Autowired
 	ProductDao productDao;

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.masai.service.interfaces.CustomerService;
+import com.masai.service.interfaces.LoginLogoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,7 @@ import com.masai.repository.CustomerDao;
 import com.masai.repository.SessionDao;
 
 @Service
-public class CustomerServiceImpl implements CustomerService{
+public class CustomerServiceImpl implements CustomerService {
 	
 	@Autowired
 	private CustomerDao customerDao;

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import com.masai.model.CategoryEnum;
 import com.masai.model.Product;
-import com.masai.model.ProductDTO;
+import com.masai.dto.ProductDTO;
 import com.masai.model.ProductStatus;
 
 

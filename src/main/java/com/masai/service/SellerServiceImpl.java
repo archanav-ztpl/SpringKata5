@@ -3,6 +3,8 @@ package com.masai.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.masai.service.interfaces.LoginLogoutService;
+import com.masai.service.interfaces.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

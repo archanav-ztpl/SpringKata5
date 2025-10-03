@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.masai.model.Seller;
-import com.masai.model.SellerDTO;
-import com.masai.model.SessionDTO;
-import com.masai.service.SellerService;
+import com.masai.dto.SellerDTO;
+import com.masai.dto.SessionDTO;
+import com.masai.service.interfaces.SellerService;
 
 @RestController
 public class SellerController {

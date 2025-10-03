@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.masai.service.interfaces.LoginLogoutService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ import com.masai.repository.SellerDao;
 import com.masai.repository.SessionDao;
 
 @Service
-public class LoginLogoutServiceImpl implements LoginLogoutService{
+public class LoginLogoutServiceImpl implements LoginLogoutService {
 
 	
 	@Autowired

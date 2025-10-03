@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.masai.model.Address;
 import com.masai.model.CreditCard;
 import com.masai.model.Customer;
-import com.masai.model.CustomerDTO;
-import com.masai.model.CustomerUpdateDTO;
+import com.masai.dto.CustomerDTO;
+import com.masai.dto.CustomerUpdateDTO;
 import com.masai.model.Order;
-import com.masai.model.SessionDTO;
-import com.masai.service.CustomerService;
+import com.masai.dto.SessionDTO;
+import com.masai.service.interfaces.CustomerService;
 
 @RestController
 public class CustomerController {

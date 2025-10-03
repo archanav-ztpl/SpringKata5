@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.masai.model.CategoryEnum;
 import com.masai.model.Product;
-import com.masai.model.ProductDTO;
+import com.masai.dto.ProductDTO;
 import com.masai.model.ProductStatus;
-import com.masai.service.ProductService;
+import com.masai.service.interfaces.ProductService;
 
 @RestController
 public class ProductController {

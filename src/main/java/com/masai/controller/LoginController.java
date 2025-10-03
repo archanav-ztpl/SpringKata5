@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.masai.model.Customer;
-import com.masai.model.CustomerDTO;
+import com.masai.dto.CustomerDTO;
 import com.masai.model.Seller;
-import com.masai.model.SellerDTO;
-import com.masai.model.SessionDTO;
+import com.masai.dto.SellerDTO;
+import com.masai.dto.SessionDTO;
 import com.masai.model.UserSession;
-import com.masai.service.CustomerService;
-import com.masai.service.LoginLogoutService;
-import com.masai.service.SellerService;
+import com.masai.service.interfaces.CustomerService;
+import com.masai.service.interfaces.LoginLogoutService;
+import com.masai.service.interfaces.SellerService;
 
 @RestController
 public class LoginController {

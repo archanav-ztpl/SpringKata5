@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.masai.model.Customer;
 import com.masai.model.Order;
-import com.masai.model.OrderDTO;
+import com.masai.dto.OrderDTO;
 import com.masai.repository.OrderDao;
-import com.masai.service.OrderService;
+import com.masai.service.interfaces.OrderService;
 
 @RestController
 public class OrderController {

@@ -8,7 +8,10 @@ import lombok.*;
 @AllArgsConstructor
 @Data
 public class ErrorDetails {
-	private LocalDateTime timestamp;
-	private String message;
-	private String details;
+    private LocalDateTime timestamp;
+    private int status;
+    private String error;
+    private String message;
+    private String path;
+    private String details;
 }

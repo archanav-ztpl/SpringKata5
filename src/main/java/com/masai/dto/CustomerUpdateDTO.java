@@ -3,10 +3,10 @@ package com.masai.dto;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Column;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import com.masai.model.Address;
 import lombok.AllArgsConstructor;

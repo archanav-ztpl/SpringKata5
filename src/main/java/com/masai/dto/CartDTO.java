@@ -1,5 +1,6 @@
 package com.masai.dto;
-import javax.validation.constraints.*;
+
+import jakarta.validation.constraints.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

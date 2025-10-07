@@ -1,7 +1,7 @@
 package com.masai.dto;
 
-import javax.persistence.Embedded;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.Embedded;
+import jakarta.validation.constraints.NotNull;
 
 import com.masai.model.CreditCard;
 import lombok.AllArgsConstructor;

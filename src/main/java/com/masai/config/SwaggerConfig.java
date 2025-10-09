@@ -15,10 +15,18 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI(@Value("${springdoc.version}") String appVersion) {
         return new OpenAPI()
-            .components(new Components().addSecuritySchemes("basicScheme",
-                    new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic")))
-            .info(new Info().title("E-Commerce Application REST API").version(appVersion)
-                    .license(new License().name("Apache 2.0").url("http://springdoc.org")));
+            .components(new Components()
+                .addSecuritySchemes("bearerAuth",
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"")
+                ))
+            .info(new Info()
+                .title("E-Commerce Application REST API")
+                .description("Modern e-commerce platform")
+                .version(appVersion)
+                .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }
 }
-

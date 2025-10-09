@@ -7,15 +7,11 @@ import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.masai.model.Seller;
@@ -23,8 +19,23 @@ import com.masai.dto.SellerDTO;
 import com.masai.dto.SessionDTO;
 import com.masai.service.interfaces.SellerService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+@Tag(name = "Seller Controller", description = "APIs for managing sellers")
 @RestController
+@RequestMapping("/api/v1/sellers")
+@SecurityRequirement(name = "bearerAuth")
 public class SellerController {
+
+    private static final Logger logger = LoggerFactory.getLogger(SellerController.class);
 
     private final SellerService sellerService;
 
@@ -33,102 +44,123 @@ public class SellerController {
         this.sellerService = sellerService;
     }
 
+    private String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
 
     //Add seller-------------------------------------
 
-    @PostMapping("/addseller")
-    public ResponseEntity<Seller> addSellerHandler(@Valid @RequestBody Seller seller){
+    @Operation(summary = "Add a new seller", description = "Creates a new seller account")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller object containing seller details", required = true, content = @Content(schema = @Schema(implementation = Seller.class)))
+    @PostMapping
+    public ResponseEntity<Seller> addSeller(@Valid @RequestBody Seller seller){
 
-        Seller addseller= sellerService.addSeller(seller);
+        logger.info("Adding a new seller: {}", seller.getFirstName());
+        Seller addedSeller= sellerService.addSeller(seller);
+        logger.info("Seller added successfully with ID: {}", addedSeller.getSellerId());
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(addseller.getSellerId())
+                .buildAndExpand(addedSeller.getSellerId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(addseller);
+        return ResponseEntity.created(location).body(addedSeller);
     }
-
-
 
     //Get the list of seller-----------------------
 
-
-    @GetMapping("/sellers")
-    public ResponseEntity<List<Seller>> getAllSellerHandler(){
+    @Operation(summary = "Get all sellers", description = "Fetches a list of all sellers")
+    @GetMapping
+    public ResponseEntity<List<Seller>> getAllSeller(){
 
         List<Seller> sellers= sellerService.getAllSellers();
 
         return ResponseEntity.ok(sellers);
     }
 
-
     //Get the seller by Id............................
 
-
-    @GetMapping("/seller/{sellerId}")
-    public ResponseEntity<Seller> getSellerByIdHandler(@PathVariable("sellerId") Integer sellerId){
+    @Operation(summary = "Get seller by ID", description = "Fetches details of a seller by their ID")
+    @Parameter(name = "sellerId", description = "ID of the seller", required = true)
+    @GetMapping("/{sellerId}")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Seller> getSellerById(@PathVariable("sellerId") Integer sellerId){
 
         Seller getSeller= sellerService.getSellerById(sellerId);
 
         return ResponseEntity.ok(getSeller);
     }
 
-
     // Get Seller by mobile Number
 
+    @Operation(summary = "Get seller by mobile", description = "Fetches details of a seller by their mobile number")
     @GetMapping("/seller")
-    public ResponseEntity<Seller> getSellerByMobileHandler(@RequestParam("mobile") String mobile, @RequestHeader("token") String token){
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Seller> getSellerByMobile(@Parameter(name = "mobile", description = "Mobile number of the seller", required = true) @RequestParam("mobile") String mobile) {
 
-        Seller getSeller= sellerService.getSellerByMobile(mobile, token);
+        String currentUsername = getCurrentUsername();
+        Seller getSeller = sellerService.getSellerByMobile(mobile, currentUsername);
 
         return ResponseEntity.ok(getSeller);
     }
 
-
     // Get currently logged in seller
 
-    @GetMapping("/seller/current")
-    public ResponseEntity<Seller> getLoggedInSellerHandler(@RequestHeader("token") String token){
+    @Operation(summary = "Get logged-in seller details", description = "Fetches details of the currently logged-in seller")
+    @GetMapping("/current")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Seller> getLoggedInSeller(){
 
-        Seller getSeller = sellerService.getCurrentlyLoggedInSeller(token);
+        String currentUsername = getCurrentUsername();
+        Seller getSeller = sellerService.getCurrentlyLoggedInSeller(currentUsername);
 
         return ResponseEntity.ok(getSeller);
     }
 
     //Update the seller..............................
 
-
-    @PutMapping("/seller")
-    public ResponseEntity<Seller> updateSellerHandler(@RequestBody Seller seller, @RequestHeader("token") String token){
-        Seller updatedseller= sellerService.updateSeller(seller, token);
-
-        return ResponseEntity.ok(updatedseller);
-
-    }
-
-
-    @PutMapping("/seller/update/mobile")
-    public ResponseEntity<Seller> updateSellerMobileHandler(@Valid @RequestBody SellerDTO sellerDto, @RequestHeader("token") String token){
-        Seller updatedseller= sellerService.updateSellerMobile(sellerDto, token);
+    @Operation(summary = "Update an existing seller", description = "Updates an existing seller account")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller object containing seller details", required = true, content = @Content(schema = @Schema(implementation = Seller.class)))
+    @PutMapping
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Seller> updateSeller(@RequestBody Seller seller){
+        String currentUsername = getCurrentUsername();
+        Seller updatedseller= sellerService.updateSeller(seller, currentUsername);
 
         return ResponseEntity.ok(updatedseller);
+
     }
 
+    @Operation(summary = "Update seller mobile number", description = "Updates seller mobile number")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller object containing required seller details", required = true, content = @Content(schema = @Schema(implementation = SellerDTO.class)))
+    @PutMapping("/update/mobile")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Seller> updateSellerMobile(@Valid @RequestBody SellerDTO sellerDto){
+        String currentUsername = getCurrentUsername();
+        Seller updatedseller= sellerService.updateSellerMobile(sellerDto, currentUsername);
 
-    @PutMapping("/seller/update/password")
-    public ResponseEntity<SessionDTO> updateSellerPasswordHandler(@Valid @RequestBody SellerDTO sellerDto, @RequestHeader("token") String token){
-        return ResponseEntity.ok(sellerService.updateSellerPassword(sellerDto, token));
+        return ResponseEntity.ok(updatedseller);
     }
 
-    @DeleteMapping("/seller/{sellerId}")
-    public ResponseEntity<Void> deleteSellerByIdHandler(@PathVariable("sellerId") Integer sellerId, @RequestHeader("token") String token){
+    @Operation(summary = "Update seller password", description = "Updates seller password")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller object containing required seller details", required = true, content = @Content(schema = @Schema(implementation = SellerDTO.class)))
+    @PutMapping("/update/password")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<SessionDTO> updateSellerPassword(@Valid @RequestBody SellerDTO sellerDto){
+        String currentUsername = getCurrentUsername();
+        return ResponseEntity.ok(sellerService.updateSellerPassword(sellerDto, currentUsername));
+    }
 
-        sellerService.deleteSellerById(sellerId, token);
+    @Operation(summary = "Delete seller account", description = "Deletes seller account by ID")
+    @DeleteMapping("/{sellerId}")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Void> deleteSellerById(@Parameter(name = "sellerId", description = "ID of the seller", required = true) @PathVariable("sellerId") Integer sellerId){
+
+        String currentUsername = getCurrentUsername();
+        sellerService.deleteSellerById(sellerId, currentUsername);
 
         return ResponseEntity.noContent().build();
-
     }
-
 
 }

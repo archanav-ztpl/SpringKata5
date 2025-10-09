@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.masai.service.interfaces.LoginLogoutService;
 import com.masai.service.interfaces.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.masai.exception.LoginException;
@@ -29,10 +30,15 @@ public class SellerServiceImpl implements SellerService {
 	@Autowired
 	private SessionRepository sessionRepository;
 	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public Seller addSeller(Seller seller) {
 		
+		// Encode password before saving to database
+		seller.setPassword(passwordEncoder.encode(seller.getPassword()));
+
 		Seller add= sellerRepository.save(seller);
 		
 		return add;
@@ -62,147 +68,114 @@ public class SellerServiceImpl implements SellerService {
 	}
 
 	@Override
-	public Seller updateSeller(Seller seller, String token) {
-		
-		if(!token.contains("seller")) {
-			throw new LoginException("Invalid session token for seller");
+	public Seller updateSeller(Seller seller, String username) {
+
+		// Get seller by username (mobile) from database
+		Optional<Seller> existingSellerOpt = sellerRepository.findByMobile(username);
+		if (existingSellerOpt.isEmpty()) {
+			throw new SellerException("Seller not found for username: " + username);
 		}
 		
-		loginService.checkTokenStatus(token);
-		
-		Seller existingSeller= sellerRepository.findById(seller.getSellerId()).orElseThrow(()-> new SellerException("Seller not found for this Id: "+seller.getSellerId()));
-		Seller newSeller= sellerRepository.save(seller);
+		Seller existingSeller = existingSellerOpt.get();
+
+		// Verify the seller ID matches the logged-in seller
+		if (!existingSeller.getSellerId().equals(seller.getSellerId())) {
+			throw new SellerException("Unauthorized: Cannot update another seller's information");
+		}
+
+		Seller newSeller = sellerRepository.save(seller);
 		return newSeller;
 	}
 
 	@Override
-	public void deleteSellerById(Integer sellerId, String token) {
-		
-		if(!token.contains("seller")) {
-			throw new LoginException("Invalid session token for seller");
-		}
-		
-		loginService.checkTokenStatus(token);
-		
-		Optional<Seller> opt= sellerRepository.findById(sellerId);
-		
-		if(opt.isPresent()) {
-			
-			UserSession user = sessionRepository.findByToken(token).get();
-			
-			Seller existingseller=opt.get();
-			
-			if(user.getUserId().equals(existingseller.getSellerId())) {
-				sellerRepository.delete(existingseller);
-				
-				// logic to log out a seller after he deletes his account
-				SessionDTO session = new SessionDTO();
-				session.setToken(token);
-				loginService.logoutSeller(session);
+	public void deleteSellerById(Integer sellerId, String username) {
 
-            }
-			else {
-				throw new SellerException("Verification Error in deleting seller account");
-			}
+		// Get seller by username (mobile) from database
+		Optional<Seller> currentSellerOpt = sellerRepository.findByMobile(username);
+		if (currentSellerOpt.isEmpty()) {
+			throw new SellerException("Seller not found for username: " + username);
 		}
-		else throw new SellerException("Seller not found for this ID: "+sellerId);
 		
+		Seller currentSeller = currentSellerOpt.get();
+
+		// Verify the seller is trying to delete their own account
+		if (!currentSeller.getSellerId().equals(sellerId)) {
+			throw new SellerException("Unauthorized: Cannot delete another seller's account");
+		}
+
+		sellerRepository.delete(currentSeller);
 	}
 
 	@Override
-	public Seller updateSellerMobile(SellerDTO sellerDTO, String token) throws SellerException {
+	public Seller updateSellerMobile(SellerDTO sellerDTO, String username) throws SellerException {
 
-		if(!token.contains("seller")) {
-			throw new LoginException("Invalid session token for seller");
+		// Get seller by current username (mobile) from database
+		Optional<Seller> existingSellerOpt = sellerRepository.findByMobile(username);
+		if (existingSellerOpt.isEmpty()) {
+			throw new SellerException("Seller not found for username: " + username);
 		}
 		
-		loginService.checkTokenStatus(token);
-		
-		UserSession user = sessionRepository.findByToken(token).get();
-		
-		Seller existingSeller= sellerRepository.findById(user.getUserId()).orElseThrow(()->new SellerException("Seller not found for this ID: "+ user.getUserId()));
-		
-		if(existingSeller.getPassword().equals(sellerDTO.getPassword())) {
+		Seller existingSeller = existingSellerOpt.get();
+
+		if(passwordEncoder.matches(sellerDTO.getPassword(), existingSeller.getPassword())) {
 			existingSeller.setMobile(sellerDTO.getMobile());
 			return sellerRepository.save(existingSeller);
 		}
 		else {
-			throw new SellerException("Error occured in updating mobile. Please enter correct password");
+			throw new SellerException("Error occurred in updating mobile. Please enter correct password");
 		}
 	}
 
 	@Override
-	public Seller getSellerByMobile(String mobile, String token) throws SellerException {
-		
-		if(!token.contains("seller")) {
-			throw new LoginException("Invalid session token for seller");
+	public Seller getSellerByMobile(String mobile, String username) throws SellerException {
+
+		// Verify the requesting user is a seller (additional security check)
+		Optional<Seller> requestingSeller = sellerRepository.findByMobile(username);
+		if (requestingSeller.isEmpty()) {
+			throw new SellerException("Unauthorized access");
 		}
 		
-		loginService.checkTokenStatus(token);
-		
-		Seller existingSeller = sellerRepository.findByMobile(mobile).orElseThrow( () -> new SellerException("Seller not found with given mobile"));
-		
+		Seller existingSeller = sellerRepository.findByMobile(mobile).orElseThrow(
+			() -> new SellerException("Seller not found with given mobile"));
+
 		return existingSeller;
 	}
 	
 	@Override
-	public Seller getCurrentlyLoggedInSeller(String token) throws SellerException{
-		
-		if(!token.contains("seller")) {
-			throw new LoginException("Invalid session token for seller");
-		}
-		
-		loginService.checkTokenStatus(token);
-		
-		UserSession user = sessionRepository.findByToken(token).get();
-		
-		Seller existingSeller= sellerRepository.findById(user.getUserId()).orElseThrow(()->new SellerException("Seller not found for this ID"));
-		
+	public Seller getCurrentlyLoggedInSeller(String username) throws SellerException{
+
+		Seller existingSeller = sellerRepository.findByMobile(username).orElseThrow(
+			() -> new SellerException("Seller not found for username: " + username));
+
 		return existingSeller;
-		
 	}
 	
 	
-	// Method to update password - based on current token
-	
+	// Method to update password - based on current username
+
 	@Override
-	public SessionDTO updateSellerPassword(SellerDTO sellerDTO, String token) {
+	public SessionDTO updateSellerPassword(SellerDTO sellerDTO, String username) {
 
-		if(!token.contains("seller")) {
-			throw new LoginException("Invalid session token for seller");
-		}
+		// Get seller by username (mobile) from database
+		Optional<Seller> opt = sellerRepository.findByMobile(username);
 
-
-		loginService.checkTokenStatus(token);
-			
-		UserSession user = sessionRepository.findByToken(token).get();
-			
-		Optional<Seller> opt = sellerRepository.findById(user.getUserId());
-			
 		if(opt.isEmpty())
 			throw new SellerException("Seller does not exist");
 			
 		Seller existingSeller = opt.get();
-			
 
 		if(!sellerDTO.getMobile().equals(existingSeller.getMobile())) {
 			throw new SellerException("Verification error. Mobile number does not match");
 		}
 			
-		existingSeller.setPassword(sellerDTO.getPassword());
-			
+		existingSeller.setPassword(passwordEncoder.encode(sellerDTO.getPassword()));
+
 		sellerRepository.save(existingSeller);
 			
 		SessionDTO session = new SessionDTO();
-			
-		session.setToken(token);
-			
-		loginService.logoutSeller(session);
-			
-		session.setMessage("Updated password and logged out. Login again with new password");
-			
+		session.setMessage("Password updated successfully. Please login again with new password");
+
 		return session;
 
 	}
-
 }

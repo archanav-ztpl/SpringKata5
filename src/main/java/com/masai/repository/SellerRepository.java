@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.masai.model.Seller;
 
 public interface SellerRepository extends JpaRepository<Seller, Integer> {
-	
-	Optional<Seller> findByMobile(String mobile);
-	
+
+    Optional<Seller> findByMobile(String mobile);
+    Optional<Seller> findByEmailId(String emailId);
+
 }

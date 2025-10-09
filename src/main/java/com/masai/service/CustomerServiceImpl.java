@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.masai.service.interfaces.CustomerService;
 import com.masai.service.interfaces.LoginLogoutService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.masai.exception.CustomerException;
@@ -38,7 +39,10 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private SessionRepository sessionRepository;
 	
-	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+
 	// Method to add a new customer
 	
 	@Override
@@ -46,6 +50,9 @@ public class CustomerServiceImpl implements CustomerService {
 				
 		customer.setCreatedOn(LocalDateTime.now());
 		
+		// Encode password before saving to database
+		customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+
 		Cart c = new Cart();
 		
 		System.out.println(c);
@@ -163,7 +170,7 @@ public class CustomerServiceImpl implements CustomerService {
 			}
 			
 			if(customer.getPassword() != null) {
-				existingCustomer.setPassword(customer.getPassword());
+				existingCustomer.setPassword(passwordEncoder.encode(customer.getPassword()));
 			}
 			
 			if(customer.getAddress() != null) {			
@@ -244,8 +251,8 @@ public class CustomerServiceImpl implements CustomerService {
 			throw new CustomerException("Verification error. Mobile number does not match");
 		}
 		
-		existingCustomer.setPassword(customerDTO.getPassword());
-		
+		existingCustomer.setPassword(passwordEncoder.encode(customerDTO.getPassword()));
+
 		customerRepository.save(existingCustomer);
 		
 		SessionDTO session = new SessionDTO();
@@ -342,8 +349,8 @@ public class CustomerServiceImpl implements CustomerService {
 		session.setToken(token);
 		
 		if(existingCustomer.getMobileNo().equals(customerDTO.getMobileId()) 
-				&& existingCustomer.getPassword().equals(customerDTO.getPassword())) {
-			
+				&& passwordEncoder.matches(customerDTO.getPassword(), existingCustomer.getPassword())) {
+
 			customerRepository.delete(existingCustomer);
 			
 			loginService.logoutCustomer(session);

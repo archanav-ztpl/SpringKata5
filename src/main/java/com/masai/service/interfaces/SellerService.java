@@ -15,16 +15,16 @@ public interface SellerService {
 	
 	public Seller getSellerById(Integer sellerId)throws SellerException;
 	
-	public Seller getSellerByMobile(String mobile, String token) throws SellerException;
-	
-	public Seller getCurrentlyLoggedInSeller(String token) throws SellerException;
-	
-	public SessionDTO updateSellerPassword(SellerDTO sellerDTO, String token) throws SellerException;
-	
-	public Seller updateSeller(Seller seller, String token)throws SellerException;
-	
-	public Seller updateSellerMobile(SellerDTO sellerDTO, String token)throws SellerException;
+	public Seller getSellerByMobile(String mobile, String username) throws SellerException;
 
-	public void deleteSellerById(Integer sellerId, String token)throws SellerException;
+	public Seller getCurrentlyLoggedInSeller(String username) throws SellerException;
+
+	public SessionDTO updateSellerPassword(SellerDTO sellerDTO, String username) throws SellerException;
+
+	public Seller updateSeller(Seller seller, String username)throws SellerException;
+
+	public Seller updateSellerMobile(SellerDTO sellerDTO, String username)throws SellerException;
+
+	public void deleteSellerById(Integer sellerId, String username)throws SellerException;
 
 }

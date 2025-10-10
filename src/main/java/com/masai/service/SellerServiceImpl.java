@@ -3,6 +3,9 @@ package com.masai.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.masai.dto.CreateSellerDTO;
+import com.masai.dto.UpdateSellerDTO;
+import com.masai.mapper.SellerMapper;
 import com.masai.service.interfaces.LoginLogoutService;
 import com.masai.service.interfaces.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ public class SellerServiceImpl implements SellerService {
 	private SellerRepository sellerRepository;
 	
 	@Autowired
+	private SellerMapper sellerMapper;
+
+	@Autowired
 	private LoginLogoutService loginService;
 	
 	@Autowired
@@ -34,14 +40,15 @@ public class SellerServiceImpl implements SellerService {
 	private PasswordEncoder passwordEncoder;
 
 	@Override
-	public Seller addSeller(Seller seller) {
-		
-		// Encode password before saving to database
-		seller.setPassword(passwordEncoder.encode(seller.getPassword()));
+	public Seller createSeller(CreateSellerDTO createSellerDTO) {
 
-		Seller add= sellerRepository.save(seller);
-		
-		return add;
+		// Use MapStruct mapper to convert DTO to entity
+		Seller seller = sellerMapper.toEntity(createSellerDTO);
+
+		// Set encoded password separately for security
+		seller.setPassword(passwordEncoder.encode(createSellerDTO.getPassword()));
+
+		return sellerRepository.save(seller);
 	}
 
 	@Override
@@ -68,7 +75,7 @@ public class SellerServiceImpl implements SellerService {
 	}
 
 	@Override
-	public Seller updateSeller(Seller seller, String username) {
+	public Seller updateSeller(UpdateSellerDTO updateSellerDTO, String username) {
 
 		// Get seller by username (mobile) from database
 		Optional<Seller> existingSellerOpt = sellerRepository.findByMobile(username);
@@ -78,13 +85,16 @@ public class SellerServiceImpl implements SellerService {
 		
 		Seller existingSeller = existingSellerOpt.get();
 
-		// Verify the seller ID matches the logged-in seller
-		if (!existingSeller.getSellerId().equals(seller.getSellerId())) {
+		// If sellerId is provided in DTO, verify it matches the logged-in seller
+		if (updateSellerDTO.getSellerId() != null &&
+			!existingSeller.getSellerId().equals(updateSellerDTO.getSellerId())) {
 			throw new SellerException("Unauthorized: Cannot update another seller's information");
 		}
 
-		Seller newSeller = sellerRepository.save(seller);
-		return newSeller;
+		// Use MapStruct to update existing entity with DTO values
+		sellerMapper.updateEntityFromDTO(updateSellerDTO, existingSeller);
+
+		return sellerRepository.save(existingSeller);
 	}
 
 	@Override

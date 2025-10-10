@@ -4,13 +4,15 @@ import java.util.List;
 
 import com.masai.exception.SellerException;
 import com.masai.model.Seller;
+import com.masai.dto.CreateSellerDTO;
+import com.masai.dto.UpdateSellerDTO;
 import com.masai.dto.SellerDTO;
 import com.masai.dto.SessionDTO;
 
 public interface SellerService {
 	
-	public Seller addSeller(Seller seller);
-	
+	public Seller createSeller(CreateSellerDTO createSellerDTO);
+
 	public List<Seller> getAllSellers() throws SellerException;
 	
 	public Seller getSellerById(Integer sellerId)throws SellerException;
@@ -21,7 +23,7 @@ public interface SellerService {
 
 	public SessionDTO updateSellerPassword(SellerDTO sellerDTO, String username) throws SellerException;
 
-	public Seller updateSeller(Seller seller, String username)throws SellerException;
+	public Seller updateSeller(UpdateSellerDTO updateSellerDTO, String username)throws SellerException;
 
 	public Seller updateSellerMobile(SellerDTO sellerDTO, String username)throws SellerException;
 

@@ -20,6 +20,7 @@ import com.masai.model.Customer;
 import com.masai.dto.CustomerDTO;
 import com.masai.model.Seller;
 import com.masai.dto.SellerDTO;
+import com.masai.dto.CreateSellerDTO;
 import com.masai.security.JwtUtil;
 import com.masai.repository.CustomerRepository;
 import com.masai.repository.SellerRepository;
@@ -75,10 +76,10 @@ public class LoginController {
     }
 
     @Operation(summary = "Register a new seller", description = "Creates a new seller account")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller object containing seller details", required = true, content = @Content(schema = @Schema(implementation = Seller.class)))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller creation data", required = true, content = @Content(schema = @Schema(implementation = CreateSellerDTO.class)))
     @PostMapping(value = "/register/seller", consumes = "application/json")
-    public ResponseEntity<Seller> registerSellerAccountHandler(@Valid @RequestBody Seller seller) {
-        Seller created = sellerService.addSeller(seller);
+    public ResponseEntity<Seller> registerSellerAccountHandler(@Valid @RequestBody CreateSellerDTO createSellerDTO) {
+        Seller created = sellerService.createSeller(createSellerDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(created.getSellerId())

@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.masai.model.Seller;
+import com.masai.dto.CreateSellerDTO;
 import com.masai.dto.SellerDTO;
 import com.masai.dto.SessionDTO;
+import com.masai.dto.UpdateSellerDTO;
 import com.masai.service.interfaces.SellerService;
 
 import org.slf4j.Logger;
@@ -52,12 +54,12 @@ public class SellerController {
     //Add seller-------------------------------------
 
     @Operation(summary = "Add a new seller", description = "Creates a new seller account")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller object containing seller details", required = true, content = @Content(schema = @Schema(implementation = Seller.class)))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller creation data", required = true, content = @Content(schema = @Schema(implementation = CreateSellerDTO.class)))
     @PostMapping
-    public ResponseEntity<Seller> addSeller(@Valid @RequestBody Seller seller){
+    public ResponseEntity<Seller> createSeller(@Valid @RequestBody CreateSellerDTO createSellerDTO){
 
-        logger.info("Adding a new seller: {}", seller.getFirstName());
-        Seller addedSeller= sellerService.addSeller(seller);
+        logger.info("Adding a new seller: {}", createSellerDTO.getFirstName());
+        Seller addedSeller = sellerService.createSeller(createSellerDTO);
         logger.info("Seller added successfully with ID: {}", addedSeller.getSellerId());
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -121,15 +123,14 @@ public class SellerController {
     //Update the seller..............................
 
     @Operation(summary = "Update an existing seller", description = "Updates an existing seller account")
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller object containing seller details", required = true, content = @Content(schema = @Schema(implementation = Seller.class)))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Seller update data", required = true, content = @Content(schema = @Schema(implementation = UpdateSellerDTO.class)))
     @PutMapping
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<Seller> updateSeller(@RequestBody Seller seller){
+    public ResponseEntity<Seller> updateSeller(@Valid @RequestBody UpdateSellerDTO updateSellerDTO){
         String currentUsername = getCurrentUsername();
-        Seller updatedseller= sellerService.updateSeller(seller, currentUsername);
+        Seller updatedSeller = sellerService.updateSeller(updateSellerDTO, currentUsername);
 
-        return ResponseEntity.ok(updatedseller);
-
+        return ResponseEntity.ok(updatedSeller);
     }
 
     @Operation(summary = "Update seller mobile number", description = "Updates seller mobile number")

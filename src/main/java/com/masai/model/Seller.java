@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Pattern;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +26,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Seller {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,10 +37,10 @@ public class Seller {
 	private String firstName;
 	
 	@NotNull(message="Please enter the last name")
-	@Pattern(regexp="[A-Za-z\\s]+", message="First Name should contains alphabets only")
+	@Pattern(regexp="[A-Za-z\\s]+", message="Last Name should contains alphabets only")
 	private String lastName;
 	
-   @Pattern(regexp="[A-Za-z0-9!@#$%^&*_]{8,15}", message="Please Enter a valid Password")
+	@Pattern(regexp="[A-Za-z0-9!@#$%^&*_]{8,15}", message="Please Enter a valid Password")
 	private String password;
 	
 	@NotNull(message="Please enter your mobile Number")
@@ -46,15 +48,11 @@ public class Seller {
 	@Column(unique = true)
 	private String mobile;
 	
-	
 	@Email
 	@Column(unique = true)
 	private String emailId;
 	
-
 	@OneToMany
 	@JsonIgnore
 	private List<Product> product;
-	
-
 }
